@@ -37,7 +37,7 @@ class AuthControllerTest {
     @Test
     void shouldRegisterUserSuccessfully() {
         Map<String, String> body = Map.of(
-                "username", "janek",
+                "username", "janeczek",
                 "password", "haslo123",
                 "role", "UCZEN"
         );
