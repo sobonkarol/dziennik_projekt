@@ -1,0 +1,522 @@
+body {
+  font-family: 'Nunito', sans-serif;
+  margin: 0;
+  background-color: #1a202c;
+  color: #e2e8f0;
+  padding: 30px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+h1, h2, h3, h4, h5, h6, label {
+  color: #cbd5e0;
+}
+
+.dashboard-layout {
+  position: relative;
+  display: flex;
+  gap: 40px;
+  max-width: 1600px;
+  margin: 40px auto;
+  padding: 40px;
+  background-color: #2d3748;
+  border-radius: 16px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.logout-button {
+  position: fixed;
+  top: 10px;
+  right: 20px;
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: none;
+  background-color: #e53e3e;
+  color: white;
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+  z-index: 10;
+}
+
+.logout-button:hover {
+  background-color: #c53030;
+}
+
+.main-content {
+  flex: 2;
+  padding: 30px;
+  background-color: #1a202c;
+  border-radius: 12px;
+}
+
+.widgets-container {
+  width: 450px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+h1 {
+  margin-bottom: 30px;
+  font-size: 2.8em;
+}
+
+.add-grade-form {
+  margin-bottom: 30px;
+  padding: 25px;
+  border-radius: 12px;
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  background-color: #2d3748;
+}
+
+.select-input,
+.edit-select {
+  appearance: none; /* Usuwa domyślne style przeglądarki */
+  padding: 12px 35px 12px 15px; /* Dodaje padding z prawej strony na strzałkę */
+  border-radius: 10px;
+  border: 1px solid #4a5568;
+  font-family: 'Nunito', sans-serif;
+  background-color: #1a202c;
+  color: #e2e8f0;
+  font-size: 16px;
+  background-image: url('data:image/svg+xml;utf8,<svg fill="#e2e8f0" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>'); /* Dodaje niestandardową strzałkę */
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+}
+
+.select-input:focus,
+.edit-select:focus {
+  outline: none;
+  border-color: #63b3ed; /* Zmienia kolor obramowania na fokusie */
+  box-shadow: 0 0 0 0.2rem rgba(66, 153, 225, 0.25); /* Dodaje subtelny cień na fokusie */
+}
+
+.text-input {
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #4a5568;
+  font-family: 'Nunito', sans-serif;
+  background-color: #1a202c;
+  color: #e2e8f0;
+  font-size: 16px;
+}
+
+.primary-button,
+.save-button,
+.cancel-button,
+.edit-button,
+.delete-button {
+  padding: 12px 20px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+.primary-button {
+  background-color: #4299e1;
+  color: white;
+}
+
+.primary-button:hover {
+  background-color: #2b6cb0;
+}
+
+.save-button {
+  background-color: #48bb78;
+  color: white;
+}
+
+.save-button:hover {
+  background-color: #38a169;
+}
+
+.cancel-button {
+  background-color: #718096;
+  color: white;
+}
+
+.cancel-button:hover {
+  background-color: #4a5568;
+}
+
+.edit-button {
+  background-color: #f6ad55;
+  color: #2d3748;
+}
+
+.edit-button:hover {
+  background-color: #ed8936;
+}
+
+.delete-button {
+  background-color: #e53e3e;
+  color: white;
+}
+
+.delete-button:hover {
+  background-color: #c53030;
+}
+
+.student-grades-container {
+  margin-bottom: 15px;
+  padding: 25px;
+  border-radius: 12px;
+  background-color: #2d3748;
+}
+
+.student-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  padding: 12px 0;
+  border-bottom: 1px solid #4a5568;
+}
+
+.student-header:hover {
+  background-color: rgba(74, 85, 104, 0.1);
+}
+
+.student-name {
+  font-size: 2.0em;
+  margin-bottom: 0;
+  color: #f7fafc;
+}
+
+.grades-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 0;
+  padding-left: 20px;
+  border-left: 1px solid #4a5568;
+}
+
+.grade-item {
+  padding: 15px;
+  border-bottom: 1px solid #4a5568;
+  font-family: 'Nunito', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 1.1em;
+}
+
+.grade-details {
+  margin-right: 15px;
+}
+
+.subject {
+  font-weight: bold;
+  color: #f7fafc;
+}
+
+.value {
+  color: #81e6d9;
+  font-weight: bold;
+}
+
+.date {
+  font-size: 0.9em;
+  color: #a0aec0;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.edit-input {
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #4a5568;
+  font-family: 'Nunito', sans-serif;
+  margin-right: 10px;
+  background-color: #1a202c;
+  color: #e2e8f0;
+  font-size: 16px;
+  width: 70px;
+}
+
+.weather-widget,
+.holidays-widget {
+  padding: 30px;
+  border-radius: 12px;
+  background-color: #1a202c;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.widget-title {
+  font-size: 2em;
+  margin-bottom: 20px;
+}
+
+.weather-temp {
+  font-size: 3em;
+  color: #63b3ed;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.weather-desc {
+  font-size: 1.1em;
+  color: #a0aec0;
+  text-transform: capitalize;
+}
+
+.holidays-list {
+  list-style: none;
+  padding: 0;
+}
+
+.holiday-item {
+  padding: 12px 0;
+  border-bottom: 1px solid #4a5568;
+  font-size: 1.1em;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.holiday-date {
+  font-size: 1em;
+  color: #a0aec0;
+}
+
+.holiday-name {
+  font-weight: bold;
+  color: #f7fafc;
+}
+
+.more-holidays {
+  padding-top: 15px;
+  font-style: italic;
+  text-align: center;
+  color: #718096;
+  font-size: 1em;
+}
+
+.grade-options {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.grade-option {
+  padding: 12px 18px;
+  border-radius: 10px;
+  border: 2px solid #4a5568;
+  background-color: #2d3748;
+  color: #e2e8f0;
+  cursor: pointer;
+  font-size: 1.1em;
+  font-weight: 600;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.grade-option.selected {
+  background-color: #4299e1;
+  border-color: #4299e1;
+}
+
+.grade-option:hover:not(.selected) {
+  border-color: #63b3ed;
+}
+
+.expand-arrow {
+  font-size: 1.1em;
+  color: #a0aec0;
+  margin-left: 10px;
+}
+
+/* Style dla strony logowania */
+.p-4 {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh; /* Pełna wysokość okna przeglądarki */
+  background-color: #1a202c; /* Ciemne tło */
+  color: #e2e8f0; /* Jasny tekst */
+}
+
+.text-2xl {
+  font-size: 1.5rem; /* Odpowiednik text-2xl z Tailwind CSS */
+  font-weight: bold;
+  margin-bottom: 30px;
+  color: #cbd5e0; /* Jasny kolor nagłówka */
+}
+
+/* Style dla formularza logowania */
+.login-form {
+  background-color: #2d3748; /* Ciemniejsze tło formularza */
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  width: 400px; /* Określona szerokość formularza */
+  max-width: 90%; /* Maksymalna szerokość, aby był responsywny */
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bold;
+  color: #cbd5e0; /* Jasny kolor etykiet */
+}
+
+.input-field {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #4a5568;
+  font-family: 'Nunito', sans-serif;
+  background-color: #1a202c;
+  color: #e2e8f0;
+  font-size: 16px;
+  box-sizing: border-box; /* Uwzględnia padding i border w szerokości */
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: #63b3ed;
+  box-shadow: 0 0 0 0.2rem rgba(66, 153, 225, 0.25);
+}
+
+.login-button {
+  width: 100%;
+  padding: 12px 20px;
+  border-radius: 10px;
+  border: none;
+  background-color: #4299e1; /* Nowoczesny, niebieski kolor przycisku */
+  color: white;
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+.login-button:hover {
+  background-color: #2b6cb0;
+}
+
+/* Style dla formularza rejestracji */
+.register-form {
+  background-color: #2d3748; /* Ciemniejsze tło formularza */
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  width: 400px; /* Określona szerokość formularza */
+  max-width: 90%; /* Maksymalna szerokość, aby był responsywny */
+  margin: 30px auto; /* Wyśrodkowanie formularza na stronie rejestracji */
+}
+
+.register-form .form-group {
+  margin-bottom: 20px;
+}
+
+.register-form .form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bold;
+  color: #cbd5e0; /* Jasny kolor etykiet */
+}
+
+.register-form .input-field,
+.register-form .select-input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #4a5568;
+  font-family: 'Nunito', sans-serif;
+  background-color: #1a202c;
+  color: #e2e8f0;
+  font-size: 16px;
+  box-sizing: border-box; /* Uwzględnia padding i border w szerokości */
+  appearance: none; /* Usuwa domyślne style selecta */
+  background-image: url('data:image/svg+xml;utf8,<svg fill="#e2e8f0" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>'); /* Dodaje niestandardową strzałkę */
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+}
+
+.register-form .input-field:focus,
+.register-form .select-input:focus {
+  outline: none;
+  border-color: #63b3ed;
+  box-shadow: 0 0 0 0.2rem rgba(66, 153, 225, 0.25);
+}
+
+.register-button {
+  width: 100%;
+  padding: 12px 20px;
+  border-radius: 10px;
+  border: none;
+  background-color: #48bb78; /* Zielony kolor dla przycisku rejestracji */
+  color: white;
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+.register-button:hover {
+  background-color: #38a169;
+}
+
+.register-link {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.register-button-link {
+  display: inline-block;
+  padding: 8px 15px;
+  border-radius: 8px;
+  border: 1px solid #63b3ed; /* Kolor podobny do akcentu */
+  color: #63b3ed;
+  text-decoration: none;
+  font-size: 14px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.register-button-link:hover {
+  background-color: #63b3ed;
+  color: white;
+}
+
+.login-link {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.login-button-link {
+  display: inline-block;
+  padding: 8px 15px;
+  border-radius: 8px;
+  border: 1px solid #63b3ed; /* Kolor podobny do akcentu */
+  color: #63b3ed;
+  text-decoration: none;
+  font-size: 14px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.login-button-link:hover {
+  background-color: #63b3ed;
+  color: white;
+}
