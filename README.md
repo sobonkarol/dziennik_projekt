@@ -78,5 +78,5 @@ Wymagania:
 
 ## 🧑‍💻 Autor
 
-Projekt wykonany w ramach zaliczenia — Karol Soboń, Wiktoria Szostek
+Projekt wykonany w ramach zaliczenia — Karol Soboń, Weronika Szostek
 
