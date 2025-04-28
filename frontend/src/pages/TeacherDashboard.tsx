@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 interface User {
   id: string;
@@ -27,10 +27,7 @@ export default function TeacherDashboard() {
     uczenId: "",
   });
   const [editingOcenaId, setEditingOcenaId] = useState<string | null>(null);
-  const [editedOcena, setEditedOcena] = useState<{
-    przedmiot?: string;
-    wartosc?: number;
-  } | null>(null);
+  const [editedOcena, setEditedOcena] = useState<{ przedmiot?: string; wartosc?: number } | null>(null);
   const [pogoda, setPogoda] = useState<any>(null);
   const [swieta, setSwieta] = useState<any[]>([]);
   const [expandedStudentId, setExpandedStudentId] = useState<string | null>(null);
@@ -39,18 +36,32 @@ export default function TeacherDashboard() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const resStudents = await axios.get("http://localhost:8080/api/users?role=UCZEN");
-        const resOceny = await axios.get("http://localhost:8080/api/oceny");
-        const resWeather = await axios.get("http://localhost:8080/api/pogoda/Warszawa");
-        const resSwieta = await axios.get("http://localhost:8080/api/swieta/PL/2025");
+        const token = localStorage.getItem("authToken");
+        if (!token) {
+          navigate("/login");
+          return;
+        }
+        const config = { headers: { Authorization: `Bearer ${token}` } };
 
+        // Ładujemy uczniów
+        const resStudents = await axios.get("http://localhost:8080/api/users", config);
+        const studentsData = Array.isArray(resStudents.data) ? resStudents.data : [resStudents.data];
         setStudents(
-          resStudents.data.sort((a: User, b: User) =>
+          studentsData.sort((a: User, b: User) =>
             `${a.lastName} ${a.firstName}`.localeCompare(`${b.lastName} ${b.firstName}`)
           )
         );
+
+        // Ładujemy oceny
+        const resOceny = await axios.get("http://localhost:8080/api/oceny", config);
         setOceny(resOceny.data);
+
+        // Ładujemy pogodę
+        const resWeather = await axios.get("http://localhost:8080/api/pogoda/Warszawa", config);
         setPogoda(resWeather.data);
+
+        // Ładujemy święta
+        const resSwieta = await axios.get("http://localhost:8080/api/swieta/PL/2025", config);
         setSwieta(resSwieta.data);
       } catch (error) {
         console.error("Błąd ładowania danych:", error);
@@ -58,15 +69,18 @@ export default function TeacherDashboard() {
     }
 
     fetchData();
-  }, []);
+  }, [navigate]);
 
   const handleAddOcena = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      const token = localStorage.getItem("authToken");
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+
       const response = await axios.post("http://localhost:8080/api/oceny", {
         ...nowaOcena,
         data: new Date().toISOString().split("T")[0],
-      });
+      }, config);
       setOceny([...oceny, response.data]);
       setNowaOcena({ przedmiot: "", wartosc: mozliweOceny[0], uczenId: "" });
     } catch (error) {
@@ -75,8 +89,15 @@ export default function TeacherDashboard() {
   };
 
   const handleDelete = async (id: string) => {
-    await axios.delete(`http://localhost:8080/api/oceny/${id}`);
-    setOceny(oceny.filter((o) => o.id !== id));
+    try {
+      const token = localStorage.getItem("authToken");
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+
+      await axios.delete(`http://localhost:8080/api/oceny/${id}`, config);
+      setOceny(oceny.filter((o) => o.id !== id));
+    } catch (error) {
+      console.error("Błąd podczas usuwania oceny:", error);
+    }
   };
 
   const handleEdit = (ocena: Ocena) => {
@@ -91,24 +112,27 @@ export default function TeacherDashboard() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setEditedOcena((prevEditedOcena) => ({
-      ...prevEditedOcena,
-      [name]: name === 'wartosc' ? Number(value) : value,
+    setEditedOcena((prev) => ({
+      ...prev,
+      [name]: name === "wartosc" ? Number(value) : value,
     }));
   };
 
   const handleOcenaWybrana = (ocena: number) => {
-    setNowaOcena((prevNowaOcena) => ({ ...prevNowaOcena, wartosc: ocena }));
+    setNowaOcena((prev) => ({ ...prev, wartosc: ocena }));
   };
 
   const handleEdytowanaOcenaWybrana = (ocena: number) => {
-    setEditedOcena((prevEditedOcena) => ({ ...prevEditedOcena, wartosc: ocena }));
+    setEditedOcena((prev) => ({ ...prev, wartosc: ocena }));
   };
 
   const handleSaveEdit = async (id: string) => {
     if (editedOcena) {
       try {
-        const response = await axios.put(`http://localhost:8080/api/oceny/${id}`, editedOcena);
+        const token = localStorage.getItem("authToken");
+        const config = { headers: { Authorization: `Bearer ${token}` } };
+
+        const response = await axios.put(`http://localhost:8080/api/oceny/${id}`, editedOcena, config);
         setOceny(oceny.map((o) => (o.id === id ? response.data : o)));
         setEditingOcenaId(null);
         setEditedOcena(null);
@@ -119,12 +143,12 @@ export default function TeacherDashboard() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('authToken');
-    navigate('/login');
+    localStorage.removeItem("authToken");
+    navigate("/login");
   };
 
   const toggleStudentGrades = (studentId: string) => {
-    setExpandedStudentId((prevId) => (prevId === studentId ? null : studentId));
+    setExpandedStudentId((prev) => (prev === studentId ? null : studentId));
   };
 
   return (
@@ -132,11 +156,12 @@ export default function TeacherDashboard() {
       <button className="logout-button" onClick={handleLogout}>
         Wyloguj
       </button>
-      {/* Lewa strona - główna treść */}
+
+      {/* Lewa strona */}
       <div className="main-content">
         <h1>Panel nauczyciela</h1>
 
-        {/* Formularz dodawania oceny */}
+        {/* Formularz dodawania ocen */}
         <form onSubmit={handleAddOcena} className="add-grade-form">
           <select
             value={nowaOcena.uczenId}
@@ -178,7 +203,7 @@ export default function TeacherDashboard() {
           <button type="submit" className="primary-button">Dodaj ocenę</button>
         </form>
 
-        {/* Lista uczniów z rozwijanymi ocenami i numeracją */}
+        {/* Lista uczniów */}
         {students.map((student, index) => (
           <div key={student.id} className="student-grades-container">
             <div className="student-header" onClick={() => toggleStudentGrades(student.id)}>
@@ -244,31 +269,59 @@ export default function TeacherDashboard() {
         ))}
       </div>
 
-      {/* Prawa strona - widgety */}
-      <div className="widgets-container">
-        {pogoda && (
-          <div className="weather-widget">
-            <h2 className="widget-title">Pogoda w Warszawie</h2>
-            <p className="weather-temp">Temperatura: {pogoda.main.temp}°C</p>
-            <p className="weather-desc">{pogoda.weather[0].description}</p>
-          </div>
-        )}
-
-        {swieta.length > 0 && (
-          <div className="holidays-widget">
-            <h2 className="widget-title">Nadchodzące Święta (2025)</h2>
-            <ul className="holidays-list">
-              {swieta.slice(0, 5).map((s, i) => (
-                <li key={i} className="holiday-item">
-                  <span className="holiday-date">{s.date}</span>
-                  <span className="holiday-name">{s.name}</span>
-                </li>
-              ))}
-              {swieta.length > 5 && <li className="more-holidays">...i więcej</li>}
-            </ul>
-          </div>
-        )}
+{/* Prawa strona - widgety */}
+<div className="widgets-container">
+{pogoda && (
+  <div className="weather-widget">
+    <h2 className="widget-title">Pogoda w {pogoda.city_name}</h2>
+    <div className="weather-main-info">
+      <img
+        src={`https://openweathermap.org/img/wn/${pogoda.weather_icon}@2x.png`}
+        alt={pogoda.weather_description}
+        className="weather-icon"
+      />
+      <div>
+        <p className="weather-temp">Temperatura: {pogoda.temperature}°C</p>
+        <p className="weather-desc">{pogoda.weather_description}</p>
       </div>
     </div>
+    <p>Wilgotność: {pogoda.humidity}%</p>
+    <p>Wiatr: {pogoda.wind_speed} m/s</p>
+    <p>Ciśnienie: {pogoda.pressure} hPa</p>
+    <div className="school-tip">
+      <h3>Wskazówka dla uczniów:</h3>
+      {pogoda.temperature < 5 ? (
+        <p>❄️ Jest zimno! Pamiętaj o ciepłej kurtce przed wyjściem do szkoły.</p>
+      ) : pogoda.temperature > 25 ? (
+        <p>☀️ Gorąco! Zabierz ze sobą wodę na lekcje WF-u.</p>
+      ) : pogoda.weather_main === "Rain" || pogoda.weather_main === "Drizzle" ? (
+        <p>🌧️ Może padać! Zabierz parasol lub pelerynę.</p>
+      ) : pogoda.weather_main === "Snow" ? (
+        <p>❄️ Śnieg! Uważaj na śliskie chodniki w drodze do szkoły.</p>
+      ) : (
+        <p>🌤️ Idealna pogoda na lekcje WF na świeżym powietrzu!</p>
+      )}
+    </div>
+  </div>
+)}
+
+  {swieta.length > 0 && (
+    <div className="holidays-widget">
+      <h2 className="widget-title">Nadchodzące Święta (2025)</h2>
+      <ul className="holidays-list">
+        {swieta.slice(0, 5).map((s, i) => (
+          <li key={i} className="holiday-item">
+            <span className="holiday-date">{s.date}</span>
+            <span className="holiday-name">{s.name}</span>
+          </li>
+        ))}
+        {swieta.length > 5 && (
+          <li className="more-holidays">...i więcej</li>
+        )}
+      </ul>
+    </div>
+  )}
+</div>
+</div> // <- Zamknięcie głównego kontenera!
   );
 }

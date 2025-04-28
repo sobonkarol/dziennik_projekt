@@ -4,6 +4,7 @@ import org.bson.types.ObjectId;
 import org.example.backend.exception.UserNotFoundException;
 import org.example.backend.model.User;
 import org.example.backend.repository.UserRepository;
+import org.example.backend.security.JwtUtil;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,21 +16,34 @@ import java.util.Optional;
 public class UserController {
 
     private final UserRepository userRepository;
+    private final JwtUtil jwtUtil;
 
-    public UserController(UserRepository userRepository) {
+    public UserController(UserRepository userRepository, JwtUtil jwtUtil) {
         this.userRepository = userRepository;
+        this.jwtUtil = jwtUtil;
     }
 
     @GetMapping
-    public List<User> getUsersByRole(@RequestParam String role) {
-        return userRepository.findByRole(User.Role.valueOf(role.toUpperCase()));
+    public List<User> getUsersByRole(@RequestHeader("Authorization") String authorizationHeader) {
+        String token = authorizationHeader.substring(7); // usuń "Bearer "
+        String role = jwtUtil.extractRole(token);
+        String username = jwtUtil.extractUsername(token);
+
+        if (role.equals("NAUCZYCIEL")) {
+            return userRepository.findByRole(User.Role.UCZEN); // nauczyciel widzi wszystkich uczniów
+        } else if (role.equals("UCZEN")) {
+            User uczen = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new RuntimeException("Użytkownik nie istnieje"));
+            return List.of(uczen); // uczeń widzi tylko siebie
+        } else {
+            throw new RuntimeException("Nieznana rola");
+        }
     }
 
     @GetMapping("/{idOrUsername}")
     public ResponseEntity<User> getUserByIdOrUsername(@PathVariable String idOrUsername) {
         Optional<User> userOptional;
         try {
-            // Spróbuj znaleźć po _id (ObjectId)
             ObjectId objectId = new ObjectId(idOrUsername);
             userOptional = userRepository.findById(objectId.toHexString());
         } catch (IllegalArgumentException e) {
@@ -37,10 +51,7 @@ public class UserController {
             userOptional = userRepository.findByUsername(idOrUsername);
         }
 
-        if (userOptional.isPresent()) {
-            return ResponseEntity.ok(userOptional.get());
-        } else {
-            throw new UserNotFoundException("Użytkownik o ID lub nazwie '" + idOrUsername + "' nie istnieje");
-        }
+        return userOptional.map(ResponseEntity::ok)
+                .orElseThrow(() -> new UserNotFoundException("Użytkownik o ID lub nazwie '" + idOrUsername + "' nie istnieje"));
     }
 }

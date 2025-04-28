@@ -2,7 +2,10 @@ package org.example.backend.controller;
 
 import org.example.backend.exception.OcenaNotFoundException;
 import org.example.backend.model.Ocena;
+import org.example.backend.model.User;
 import org.example.backend.repository.OcenaRepository;
+import org.example.backend.repository.UserRepository;
+import org.example.backend.security.JwtUtil;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,15 +20,31 @@ import java.util.Optional;
 public class OcenaController {
 
     private final OcenaRepository ocenaRepository;
+    private final JwtUtil jwtUtil;
+    private final UserRepository userRepository;
 
-    public OcenaController(OcenaRepository ocenaRepository) {
+    public OcenaController(OcenaRepository ocenaRepository, UserRepository userRepository, JwtUtil jwtUtil) {
         this.ocenaRepository = ocenaRepository;
+        this.userRepository = userRepository;
+        this.jwtUtil = jwtUtil;
     }
 
-    @Operation(summary = "Pobierz wszystkie oceny")
+    @Operation(summary = "Pobierz wszystkie oceny (dla nauczyciela wszystkie, dla ucznia tylko swoje)")
     @GetMapping
-    public List<Ocena> getAll() {
-        return ocenaRepository.findAll();
+    public List<Ocena> getAll(@RequestHeader("Authorization") String authorizationHeader) {
+        String token = authorizationHeader.substring(7);
+        String role = jwtUtil.extractRole(token);
+        String username = jwtUtil.extractUsername(token);
+
+        if (role.equals("NAUCZYCIEL")) {
+            return ocenaRepository.findAll();
+        } else if (role.equals("UCZEN")) {
+            User uczen = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new RuntimeException("Użytkownik nie istnieje"));
+            return ocenaRepository.findByUczenId(uczen.getId());
+        } else {
+            throw new RuntimeException("Nieznana rola");
+        }
     }
 
     @Operation(summary = "Pobierz oceny konkretnego ucznia")
