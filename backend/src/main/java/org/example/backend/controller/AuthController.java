@@ -1,5 +1,7 @@
 package org.example.backend.controller;
 
+import org.example.backend.dto.RegisterRequest;
+import org.example.backend.dto.LoginRequest;
 import org.example.backend.model.User;
 import org.example.backend.repository.UserRepository;
 import org.example.backend.security.JwtUtil;
@@ -27,12 +29,20 @@ public class AuthController {
 
     @Operation(summary = "Rejestracja nowego użytkownika")
     @PostMapping("/register")
-    public String register(@RequestBody Map<String, String> body) {
-        String username = body.get("username");
-        String password = passwordEncoder.encode(body.get("password"));
-        String firstName = body.get("firstName");
-        String lastName = body.get("lastName");
-        User.Role role = User.Role.valueOf(body.get("role").toUpperCase());
+    public String register(@RequestBody RegisterRequest request) {
+        String username = request.getUsername();
+        String password = passwordEncoder.encode(request.getPassword());
+        String firstName = request.getFirstName();
+        String lastName = request.getLastName();
+        User.Role role = User.Role.valueOf(request.getRole().toUpperCase());
+
+        if (username == null || username.length() < 4 || username.contains(" ")) {
+            throw new RuntimeException("Login musi mieć co najmniej 4 znaki i nie może zawierać spacji");
+        }
+
+        if (userRepository.findByUsername(username).isPresent()) {
+            throw new RuntimeException("Login jest już zajęty");
+        }
 
         User user = new User(username, password, role, firstName, lastName);
         userRepository.save(user);
@@ -42,9 +52,9 @@ public class AuthController {
 
     @Operation(summary = "Logowanie i generowanie tokenu JWT")
     @PostMapping("/login")
-    public Map<String, String> login(@RequestBody Map<String, String> body) {
-        String username = body.get("username");
-        String password = body.get("password");
+    public Map<String, String> login(@RequestBody LoginRequest request) {
+        String username = request.getUsername();
+        String password = request.getPassword();
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Nieprawidłowy login"));
