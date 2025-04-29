@@ -1,10 +1,14 @@
 package org.example.backend.model;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
 
+@Setter
+@Getter
 @Document(collection = "oceny")
 public class Ocena {
     @Id
@@ -26,51 +30,4 @@ public class Ocena {
         this.data = data;
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getUczenId() {
-        return uczenId;
-    }
-
-    public void setUczenId(String uczenId) {
-        this.uczenId = uczenId;
-    }
-
-    public String getNauczycielId() {
-        return nauczycielId;
-    }
-
-    public void setNauczycielId(String nauczycielId) {
-        this.nauczycielId = nauczycielId;
-    }
-
-    public String getPrzedmiot() {
-        return przedmiot;
-    }
-
-    public void setPrzedmiot(String przedmiot) {
-        this.przedmiot = przedmiot;
-    }
-
-    public int getWartosc() {
-        return wartosc;
-    }
-
-    public void setWartosc(int wartosc) {
-        this.wartosc = wartosc;
-    }
-
-    public LocalDate getData() {
-        return data;
-    }
-
-    public void setData(LocalDate data) {
-        this.data = data;
-    }
 }
